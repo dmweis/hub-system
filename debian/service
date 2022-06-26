@@ -1,0 +1,16 @@
+[Unit]
+Description=Hub system
+After=network-online.target nss-lookup.target
+Wants=network-online.target
+
+[Service]
+User=hubsystem
+DynamicUser=yes
+StateDirectory=home_speak
+Type=simple
+Restart=on-failure
+RestartSec=5s
+ExecStart=/usr/bin/hub_system --config /etc/hub_system/settings
+
+[Install]
+WantedBy=default.target
