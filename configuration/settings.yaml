@@ -1,0 +1,8 @@
+server_config:
+  host: "0.0.0.0"
+  port: 3000
+mqtt:
+  broker_host: "homepi.local"
+  client_id: "hub_system"
+alarm_config:
+  save_file_path: "/var/lib/home_speak/saved_alarms.json"
