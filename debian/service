@@ -6,11 +6,11 @@ Wants=network-online.target
 [Service]
 User=hubsystem
 DynamicUser=yes
-StateDirectory=home_speak
+StateDirectory=hub_system
 Type=simple
 Restart=on-failure
 RestartSec=5s
-ExecStart=/usr/bin/hub_system --config /etc/hub_system/settings
+ExecStart=/usr/bin/hub-system --config /etc/hub_system/settings
 
 [Install]
 WantedBy=default.target
