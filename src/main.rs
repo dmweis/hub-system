@@ -1,3 +1,6 @@
+#![allow(dead_code)]
+// TODO(David): Remove this?
+
 mod configuration;
 mod mqtt;
 mod speech_service;
@@ -36,9 +39,11 @@ async fn main() -> anyhow::Result<()> {
         )
         .await?;
 
-    info!("Press Enter to exit...");
-    let _ = std::io::stdin().read(&mut [0]).unwrap();
-
+    tokio::task::spawn_blocking(move || {
+        info!("Press Enter to exit...");
+        let _ = std::io::stdin().read(&mut [0]).unwrap();
+    })
+    .await?;
     Ok(())
 }
 

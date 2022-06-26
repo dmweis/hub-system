@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use log::*;
 use mqtt_router::{RouteHandler, RouterError};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 
 #[derive(Debug)]
 pub struct MotionSensorHandler {}

@@ -23,6 +23,22 @@ impl SpeechService {
             .await?;
         Ok(())
     }
+
+    pub async fn say_plain(&self, message: &str) -> Result<()> {
+        self.say(message, AzureVoiceStyle::Plain).await
+    }
+
+    pub async fn say_angry(&self, message: &str) -> Result<()> {
+        self.say(message, AzureVoiceStyle::Angry).await
+    }
+
+    pub async fn say_cheerful(&self, message: &str) -> Result<()> {
+        self.say(message, AzureVoiceStyle::Cheerful).await
+    }
+
+    pub async fn say_sad(&self, message: &str) -> Result<()> {
+        self.say(message, AzureVoiceStyle::Sad).await
+    }
 }
 
 #[derive(Debug, Clone, Serialize)]
