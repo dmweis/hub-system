@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["hub_system"] = [{"text":"impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.61.0/core/marker/trait.Copy.html\" title=\"trait core::marker::Copy\">Copy</a> for <a class=\"enum\" href=\"hub_system/speech_service/enum.AzureVoiceStyle.html\" title=\"enum hub_system::speech_service::AzureVoiceStyle\">AzureVoiceStyle</a>","synthetic":false,"types":["hub_system::speech_service::AzureVoiceStyle"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
