@@ -62,7 +62,15 @@
 <span id="57">57</span>
 <span id="58">58</span>
 <span id="59">59</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">configuration</span>;
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
+<span class="comment">// TODO(David): Remove this?</span>
+
+<span class="kw">mod</span> <span class="ident">configuration</span>;
 <span class="kw">mod</span> <span class="ident">mqtt</span>;
 <span class="kw">mod</span> <span class="ident">speech_service</span>;
 
@@ -100,9 +108,11 @@
         )
         .<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="macro">info!</span>(<span class="string">&quot;Press Enter to exit...&quot;</span>);
-    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">std::io::stdin</span>().<span class="ident">read</span>(<span class="kw-2">&amp;mut</span> [<span class="number">0</span>]).<span class="ident">unwrap</span>();
-
+    <span class="ident">tokio::task::spawn_blocking</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
+        <span class="macro">info!</span>(<span class="string">&quot;Press Enter to exit...&quot;</span>);
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">std::io::stdin</span>().<span class="ident">read</span>(<span class="kw-2">&amp;mut</span> [<span class="number">0</span>]).<span class="ident">unwrap</span>();
+    })
+    .<span class="kw">await</span><span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(())
 }
 

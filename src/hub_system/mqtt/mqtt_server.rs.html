@@ -114,8 +114,8 @@
 <span class="kw">use</span> <span class="ident">log</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">mqtt_router::Router</span>;
 <span class="kw">use</span> <span class="ident">rumqttc</span>::{<span class="ident">AsyncClient</span>, <span class="ident">ConnAck</span>, <span class="ident">Event</span>, <span class="ident">Incoming</span>, <span class="ident">MqttOptions</span>, <span class="ident">Publish</span>, <span class="ident">QoS</span>, <span class="ident">SubscribeFilter</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">sync::Arc</span>, <span class="ident">time::Duration</span>};
-<span class="kw">use</span> <span class="ident">tokio::sync</span>::{<span class="ident">mpsc::unbounded_channel</span>, <span class="ident">Mutex</span>};
+<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
+<span class="kw">use</span> <span class="ident">tokio::sync::mpsc::unbounded_channel</span>;
 
 <span class="kw">enum</span> <span class="ident">MqttUpdate</span> {
     <span class="ident">Message</span>(<span class="ident">Publish</span>),
