@@ -1,10 +1,14 @@
 mod configuration;
+mod mqtt;
+mod speech_service;
 
 use configuration::get_configuration;
 use log::*;
 use simplelog::*;
-use std::path::PathBuf;
+use std::{io::Read, path::PathBuf};
 use structopt::StructOpt;
+
+use crate::{mqtt::start_mqtt_service, speech_service::SpeechService};
 
 #[derive(StructOpt, Debug)]
 #[structopt(
@@ -22,7 +26,18 @@ async fn main() -> anyhow::Result<()> {
     setup_logging();
     let opts = Opts::from_args();
     info!("Starting Hub System");
-    let _app_config = get_configuration(opts.config)?;
+    let app_config = get_configuration(opts.config)?;
+    let mqtt_client = start_mqtt_service(app_config)?;
+    let speech_service = SpeechService::new(mqtt_client);
+    speech_service
+        .say(
+            "Hello world! This is hub system reporting",
+            speech_service::AzureVoiceStyle::Cheerful,
+        )
+        .await?;
+
+    info!("Press Enter to exit...");
+    let _ = std::io::stdin().read(&mut [0]).unwrap();
 
     Ok(())
 }
