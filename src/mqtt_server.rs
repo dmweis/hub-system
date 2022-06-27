@@ -1,6 +1,5 @@
-use crate::configuration::AppConfig;
-
 use super::routes::{DoorSensorHandler, MotionSensorHandler, SwitchHandler};
+use crate::{configuration::AppConfig, ioc::IocContainer};
 use log::*;
 use mqtt_router::Router;
 use rumqttc::{AsyncClient, ConnAck, Event, Incoming, MqttOptions, Publish, QoS, SubscribeFilter};
@@ -12,7 +11,7 @@ enum MqttUpdate {
     Reconnection(ConnAck),
 }
 
-pub fn start_mqtt_service(app_config: AppConfig) -> anyhow::Result<AsyncClient> {
+pub fn start_mqtt_service(app_config: AppConfig, ioc: IocContainer) -> anyhow::Result<AsyncClient> {
     let mut mqttoptions = MqttOptions::new(
         &app_config.mqtt.client_id,
         &app_config.mqtt.broker_host,
@@ -58,7 +57,7 @@ pub fn start_mqtt_service(app_config: AppConfig) -> anyhow::Result<AsyncClient> 
                 .unwrap();
 
             router
-                .add_handler("zigbee2mqtt/switch/#", SwitchHandler::new())
+                .add_handler("zigbee2mqtt/switch/#", SwitchHandler::new(ioc.clone()))
                 .unwrap();
 
             router

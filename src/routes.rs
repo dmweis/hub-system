@@ -1,7 +1,9 @@
+use crate::{ioc::IocContainer, speech_service::SpeechService};
 use async_trait::async_trait;
 use log::*;
 use mqtt_router::{RouteHandler, RouterError};
 use serde::Deserialize;
+use std::sync::Arc;
 
 #[derive(Debug)]
 pub struct MotionSensorHandler {}
@@ -84,11 +86,13 @@ pub struct DoorSensor {
     pub voltage: f32,
 }
 
-pub struct SwitchHandler {}
+pub struct SwitchHandler {
+    ioc: IocContainer,
+}
 
 impl SwitchHandler {
-    pub fn new() -> Box<Self> {
-        Box::new(Self {})
+    pub fn new(ioc: IocContainer) -> Box<Self> {
+        Box::new(Self { ioc })
     }
 }
 
@@ -96,15 +100,20 @@ impl SwitchHandler {
 impl RouteHandler for SwitchHandler {
     async fn call(&mut self, topic: &str, content: &[u8]) -> std::result::Result<(), RouterError> {
         info!("Handling switch data");
+        let speech_service: Arc<SpeechService> = self.ioc.get().unwrap();
         let switch_name = topic.split('/').last().unwrap_or("unknown");
         let switch_data: SwitchPayload =
             serde_json::from_slice(content).map_err(|err| RouterError::HandlerError(err.into()))?;
 
-        let _message = match switch_data.action {
-            Action::Single => format!("switch {switch_name} was clicked once"),
-            Action::Long => format!("switch {switch_name} was long pressed"),
-            Action::Double => format!("switch {switch_name} was double clicked"),
+        let id = "This is Hub system announcement. ";
+
+        let message = match switch_data.action {
+            Action::Single => format!("{id} Switch {switch_name} was clicked once"),
+            Action::Long => format!("{id} Switch {switch_name} was long pressed"),
+            Action::Double => format!("{id} Switch {switch_name} was double clicked"),
         };
+
+        speech_service.say_cheerful(&message).await.unwrap();
 
         Ok(())
     }

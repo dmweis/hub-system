@@ -2,18 +2,18 @@
 // TODO(David): Remove this?
 
 mod configuration;
+mod ioc;
 mod mqtt_server;
 mod routes;
 mod speech_service;
 
+use crate::{ioc::IocContainer, mqtt_server::start_mqtt_service};
 use configuration::get_configuration;
 use log::*;
 use simplelog::*;
 use speech_service::SpeechService;
 use std::{io::Read, path::PathBuf};
 use structopt::StructOpt;
-
-use crate::mqtt_server::start_mqtt_service;
 
 #[derive(StructOpt, Debug)]
 #[structopt(
@@ -32,11 +32,17 @@ async fn main() -> anyhow::Result<()> {
     let opts = Opts::from_args();
     info!("Starting Hub System");
     let app_config = get_configuration(opts.config)?;
-    let mqtt_client = start_mqtt_service(app_config)?;
+
+    let container = IocContainer::default();
+
+    let mqtt_client = start_mqtt_service(app_config, container.clone())?;
     let speech_service = SpeechService::new(mqtt_client);
+
+    container.register(speech_service.clone());
+
     speech_service
         .say(
-            "Hello world! This is hub system reporting",
+            "Hub system online",
             speech_service::AzureVoiceStyle::Cheerful,
         )
         .await?;

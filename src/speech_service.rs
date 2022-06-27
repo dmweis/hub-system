@@ -2,6 +2,7 @@ use anyhow::Result;
 use rumqttc::AsyncClient;
 use serde::Serialize;
 
+#[derive(Debug, Clone)]
 pub struct SpeechService {
     mqtt_client: AsyncClient,
 }
