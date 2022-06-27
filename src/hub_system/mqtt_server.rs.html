@@ -107,6 +107,9 @@
 <span id="102">102</span>
 <span id="103">103</span>
 <span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::routes</span>::{<span class="ident">DoorSensorHandler</span>, <span class="ident">MotionSensorHandler</span>, <span class="ident">SwitchHandler</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">configuration::AppConfig</span>, <span class="ident">ioc::IocContainer</span>};
 <span class="kw">use</span> <span class="ident">log</span>::<span class="kw-2">*</span>;
@@ -162,7 +165,7 @@
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">router</span> <span class="op">=</span> <span class="ident">Router::default</span>();
 
             <span class="ident">router</span>
-                .<span class="ident">add_handler</span>(<span class="string">&quot;zigbee2mqtt/main_door&quot;</span>, <span class="ident">DoorSensorHandler::new</span>())
+                .<span class="ident">add_handler</span>(<span class="string">&quot;zigbee2mqtt/main_door&quot;</span>, <span class="ident">DoorSensorHandler::new</span>(<span class="ident">ioc</span>.<span class="ident">clone</span>()))
                 .<span class="ident">unwrap</span>();
 
             <span class="ident">router</span>
@@ -170,7 +173,10 @@
                 .<span class="ident">unwrap</span>();
 
             <span class="ident">router</span>
-                .<span class="ident">add_handler</span>(<span class="string">&quot;zigbee2mqtt/motion/#&quot;</span>, <span class="ident">MotionSensorHandler::new</span>())
+                .<span class="ident">add_handler</span>(
+                    <span class="string">&quot;zigbee2mqtt/motion/#&quot;</span>,
+                    <span class="ident">MotionSensorHandler::new</span>(<span class="ident">ioc</span>.<span class="ident">clone</span>()),
+                )
                 .<span class="ident">unwrap</span>();
 
             <span class="kw">let</span> <span class="ident">topics</span> <span class="op">=</span> <span class="ident">router</span>
