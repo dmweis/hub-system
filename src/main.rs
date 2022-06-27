@@ -1,13 +1,14 @@
 #![allow(dead_code)]
 // TODO(David): Remove this?
 
+mod blinds_service;
 mod configuration;
 mod ioc;
 mod mqtt_server;
 mod routes;
 mod speech_service;
 
-use crate::{ioc::IocContainer, mqtt_server::start_mqtt_service};
+use crate::{blinds_service::BlindsService, ioc::IocContainer, mqtt_server::start_mqtt_service};
 use configuration::get_configuration;
 use log::*;
 use simplelog::*;
@@ -36,11 +37,13 @@ async fn main() -> anyhow::Result<()> {
     let container = IocContainer::default();
 
     let mqtt_client = start_mqtt_service(app_config, container.clone())?;
-    let speech_service = SpeechService::new(mqtt_client);
 
-    container.register(speech_service.clone());
-
+    let speech_service = SpeechService::new(mqtt_client.clone());
     speech_service.say_cheerful("Hub system online").await?;
+    container.register(speech_service);
+
+    let blinds_service = BlindsService::new(mqtt_client);
+    container.register(blinds_service);
 
     std::future::pending::<()>().await;
     Ok(())

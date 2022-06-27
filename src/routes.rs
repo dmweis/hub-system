@@ -1,4 +1,4 @@
-use crate::{ioc::IocContainer, speech_service::SpeechService};
+use crate::{blinds_service::BlindsService, ioc::IocContainer, speech_service::SpeechService};
 use async_trait::async_trait;
 use log::*;
 use mqtt_router::{RouteHandler, RouterError};
@@ -11,9 +11,16 @@ trait Injected {
     fn get<T: Any + Send + Sync>(&self) -> std::result::Result<Arc<T>, RouterError> {
         // this is just playing
         // Do this correctly
-        self.ioc()
-            .get()
-            .ok_or_else(|| RouterError::HandlerError("Speech service not available".into()))
+        if let Some(service) = self.ioc().get() {
+            Ok(service)
+        } else {
+            error!(
+                "Service {} not available in {:?}",
+                std::any::type_name::<T>(),
+                self.ioc()
+            );
+            Err(RouterError::HandlerError("Service not available".into()))
+        }
     }
 }
 
@@ -161,6 +168,14 @@ impl RouteHandler for SwitchHandler {
             .say_cheerful(&message)
             .await
             .unwrap();
+
+        if let Action::Double = switch_data.action {
+            self.get::<BlindsService>()?.close_both().await.unwrap();
+            self.get::<SpeechService>()?
+                .say_cheerful(&format!("{ANNOUNCEMENT} All blinds are closing"))
+                .await
+                .unwrap();
+        }
 
         Ok(())
     }
