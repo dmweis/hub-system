@@ -48,24 +48,31 @@ impl Injected for MotionSensorHandler {
 
 #[async_trait]
 impl RouteHandler for MotionSensorHandler {
-    async fn call(&mut self, topic: &str, content: &[u8]) -> std::result::Result<(), RouterError> {
-        let motion_sensor_id = topic.split('/').last().unwrap_or("Not available");
-        info!("Handling motion sensor data");
-        let motion_sensor: MotionSensorData =
-            serde_json::from_slice(content).map_err(|err| RouterError::HandlerError(err.into()))?;
-
-        let message = if motion_sensor.occupancy {
-            format!("{ANNOUNCEMENT} Motion sensor {motion_sensor_id} triggered")
-        } else {
-            format!("{ANNOUNCEMENT} Motion sensor {motion_sensor_id} detects no movement")
-        };
-
-        self.get::<SpeechService>()?
-            .say_cheerful(&message)
-            .await
-            .unwrap();
-
+    async fn call(
+        &mut self,
+        _topic: &str,
+        _content: &[u8],
+    ) -> std::result::Result<(), RouterError> {
+        info!("Motion sensor silenced");
         Ok(())
+
+        // let motion_sensor_id = topic.split('/').last().unwrap_or("Not available");
+        // info!("Handling motion sensor data");
+        // let motion_sensor: MotionSensorData =
+        //     serde_json::from_slice(content).map_err(|err| RouterError::HandlerError(err.into()))?;
+
+        // let message = if motion_sensor.occupancy {
+        //     format!("{ANNOUNCEMENT} Motion sensor {motion_sensor_id} triggered")
+        // } else {
+        //     format!("{ANNOUNCEMENT} Motion sensor {motion_sensor_id} detects no movement")
+        // };
+
+        // self.get::<SpeechService>()?
+        //     .say_cheerful(&message)
+        //     .await
+        //     .unwrap();
+
+        // Ok(())
     }
 }
 
