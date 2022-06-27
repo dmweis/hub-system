@@ -40,12 +40,7 @@ async fn main() -> anyhow::Result<()> {
 
     container.register(speech_service.clone());
 
-    speech_service
-        .say(
-            "Hub system online",
-            speech_service::AzureVoiceStyle::Cheerful,
-        )
-        .await?;
+    speech_service.say_cheerful("Hub system online").await?;
 
     tokio::task::spawn_blocking(move || {
         info!("Press Enter to exit...");
