@@ -3,29 +3,57 @@ use async_trait::async_trait;
 use log::*;
 use mqtt_router::{RouteHandler, RouterError};
 use serde::Deserialize;
-use std::sync::Arc;
+use std::{any::Any, sync::Arc};
+
+trait Injected {
+    fn ioc(&self) -> &IocContainer;
+
+    fn get<T: Any + Send + Sync>(&self) -> std::result::Result<Arc<T>, RouterError> {
+        // this is just playing
+        // Do this correctly
+        self.ioc()
+            .get()
+            .ok_or_else(|| RouterError::HandlerError("Speech service not available".into()))
+    }
+}
+
+const ANNOUNCEMENT: &str = "This is Hub system announcement. ";
 
 #[derive(Debug)]
-pub struct MotionSensorHandler {}
+pub struct MotionSensorHandler {
+    ioc: IocContainer,
+}
 
 impl MotionSensorHandler {
-    pub fn new() -> Box<Self> {
-        Box::new(Self {})
+    pub fn new(ioc: IocContainer) -> Box<Self> {
+        Box::new(Self { ioc })
+    }
+}
+
+impl Injected for MotionSensorHandler {
+    fn ioc(&self) -> &IocContainer {
+        &self.ioc
     }
 }
 
 #[async_trait]
 impl RouteHandler for MotionSensorHandler {
-    async fn call(&mut self, _topic: &str, content: &[u8]) -> std::result::Result<(), RouterError> {
+    async fn call(&mut self, topic: &str, content: &[u8]) -> std::result::Result<(), RouterError> {
+        let motion_sensor_id = topic.split('/').last().unwrap_or("Not available");
         info!("Handling motion sensor data");
         let motion_sensor: MotionSensorData =
             serde_json::from_slice(content).map_err(|err| RouterError::HandlerError(err.into()))?;
 
-        let _message = if motion_sensor.occupancy {
-            "Motion sensor triggered"
+        let message = if motion_sensor.occupancy {
+            format!("{ANNOUNCEMENT} Motion sensor {motion_sensor_id} triggered")
         } else {
-            "Motion sensor detects no movement"
+            format!("{ANNOUNCEMENT} Motion sensor {motion_sensor_id} detects no movement")
         };
+
+        self.get::<SpeechService>()?
+            .say_cheerful(&message)
+            .await
+            .unwrap();
 
         Ok(())
     }
@@ -46,11 +74,19 @@ struct MotionSensorData {
     pub voltage: f32,
 }
 
-pub struct DoorSensorHandler {}
+pub struct DoorSensorHandler {
+    ioc: IocContainer,
+}
 
 impl DoorSensorHandler {
-    pub fn new() -> Box<Self> {
-        Box::new(Self {})
+    pub fn new(ioc: IocContainer) -> Box<Self> {
+        Box::new(Self { ioc })
+    }
+}
+
+impl Injected for DoorSensorHandler {
+    fn ioc(&self) -> &IocContainer {
+        &self.ioc
     }
 }
 
@@ -61,11 +97,16 @@ impl RouteHandler for DoorSensorHandler {
         let motion_sensor: DoorSensor =
             serde_json::from_slice(content).map_err(|err| RouterError::HandlerError(err.into()))?;
 
-        let _message = if motion_sensor.contact {
-            "Front door closed"
+        let message = if motion_sensor.contact {
+            format!("{ANNOUNCEMENT} Front door closed")
         } else {
-            "Front door opened"
+            format!("{ANNOUNCEMENT} Front door opened")
         };
+
+        self.get::<SpeechService>()?
+            .say_cheerful(&message)
+            .await
+            .unwrap();
 
         Ok(())
     }
@@ -96,24 +137,30 @@ impl SwitchHandler {
     }
 }
 
+impl Injected for SwitchHandler {
+    fn ioc(&self) -> &IocContainer {
+        &self.ioc
+    }
+}
+
 #[async_trait]
 impl RouteHandler for SwitchHandler {
     async fn call(&mut self, topic: &str, content: &[u8]) -> std::result::Result<(), RouterError> {
         info!("Handling switch data");
-        let speech_service: Arc<SpeechService> = self.ioc.get().unwrap();
         let switch_name = topic.split('/').last().unwrap_or("unknown");
         let switch_data: SwitchPayload =
             serde_json::from_slice(content).map_err(|err| RouterError::HandlerError(err.into()))?;
 
-        let id = "This is Hub system announcement. ";
-
         let message = match switch_data.action {
-            Action::Single => format!("{id} Switch {switch_name} was clicked once"),
-            Action::Long => format!("{id} Switch {switch_name} was long pressed"),
-            Action::Double => format!("{id} Switch {switch_name} was double clicked"),
+            Action::Single => format!("{ANNOUNCEMENT} Switch {switch_name} was clicked once"),
+            Action::Long => format!("{ANNOUNCEMENT} Switch {switch_name} was long pressed"),
+            Action::Double => format!("{ANNOUNCEMENT} Switch {switch_name} was double clicked"),
         };
 
-        speech_service.say_cheerful(&message).await.unwrap();
+        self.get::<SpeechService>()?
+            .say_cheerful(&message)
+            .await
+            .unwrap();
 
         Ok(())
     }

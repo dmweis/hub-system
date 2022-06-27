@@ -53,7 +53,7 @@ pub fn start_mqtt_service(app_config: AppConfig, ioc: IocContainer) -> anyhow::R
             let mut router = Router::default();
 
             router
-                .add_handler("zigbee2mqtt/main_door", DoorSensorHandler::new())
+                .add_handler("zigbee2mqtt/main_door", DoorSensorHandler::new(ioc.clone()))
                 .unwrap();
 
             router
@@ -61,7 +61,10 @@ pub fn start_mqtt_service(app_config: AppConfig, ioc: IocContainer) -> anyhow::R
                 .unwrap();
 
             router
-                .add_handler("zigbee2mqtt/motion/#", MotionSensorHandler::new())
+                .add_handler(
+                    "zigbee2mqtt/motion/#",
+                    MotionSensorHandler::new(ioc.clone()),
+                )
                 .unwrap();
 
             let topics = router
