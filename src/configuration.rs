@@ -1,6 +1,6 @@
 use log::*;
 use serde::Deserialize;
-use std::{path::PathBuf, str};
+use std::{collections::HashMap, path::PathBuf, str};
 
 /// Use default config if no path is provided
 pub fn get_configuration(config: Option<PathBuf>) -> Result<AppConfig, anyhow::Error> {
@@ -30,6 +30,7 @@ pub struct AppConfig {
     pub server_config: ServerConfig,
     pub alarm_config: AlarmConfig,
     pub mqtt: MqttConfig,
+    pub discord_bot: DiscordBotConfig,
 }
 
 #[derive(Deserialize, Debug, Clone)]
@@ -61,4 +62,12 @@ pub struct MqttConfig {
     #[serde(default = "default_mqtt_port")]
     pub broker_port: u16,
     pub client_id: String,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+pub struct DiscordBotConfig {
+    pub whole_sum_boi_base_topic: String,
+    pub notification_discord_channel: u64,
+    pub spam_channel_id: u64,
+    pub channels: HashMap<String, u64>,
 }

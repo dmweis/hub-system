@@ -6,3 +6,8 @@ mqtt:
   client_id: "hub_system"
 alarm_config:
   save_file_path: "/var/lib/home_speak/saved_alarms.json"
+discord_bot:
+  notification_discord_channel: 0
+  spam_channel_id: 0
+  channels:
+    "General": 7920461341

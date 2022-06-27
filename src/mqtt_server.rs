@@ -1,4 +1,4 @@
-use super::routes::{DoorSensorHandler, MotionSensorHandler, SwitchHandler};
+use super::routes::{DiscordHandler, DoorSensorHandler, MotionSensorHandler, SwitchHandler};
 use crate::{configuration::AppConfig, ioc::IocContainer};
 use log::*;
 use mqtt_router::Router;
@@ -47,6 +47,8 @@ pub fn start_mqtt_service(app_config: AppConfig, ioc: IocContainer) -> anyhow::R
         }
     });
 
+    let whole_sum_boi_base_topic = app_config.discord_bot.whole_sum_boi_base_topic;
+
     tokio::spawn({
         let client = client.clone();
         async move {
@@ -64,6 +66,13 @@ pub fn start_mqtt_service(app_config: AppConfig, ioc: IocContainer) -> anyhow::R
                 .add_handler(
                     "zigbee2mqtt/motion/#",
                     MotionSensorHandler::new(ioc.clone()),
+                )
+                .unwrap();
+
+            router
+                .add_handler(
+                    &format!("{}/new_message/v1", whole_sum_boi_base_topic),
+                    DiscordHandler::new(ioc.clone()),
                 )
                 .unwrap();
 
