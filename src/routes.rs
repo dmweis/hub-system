@@ -139,7 +139,12 @@ impl RouteHandler for DoorSensorHandler {
         self.get::<SpeechService>()?
             .say_cheerful(&message)
             .await
-            .unwrap();
+            .map_err(|err| RouterError::HandlerError(err.into()))?;
+
+        self.get::<DiscordService>()?
+            .send_notification(message)
+            .await
+            .map_err(|err| RouterError::HandlerError(err.into()))?;
 
         Ok(())
     }
