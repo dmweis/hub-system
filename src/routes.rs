@@ -17,7 +17,7 @@ trait Injected {
     }
 }
 
-const ANNOUNCEMENT: &str = "This is Hub system announcement. ";
+const ANNOUNCEMENT: &str = "This is Hub system announcement.";
 
 #[derive(Debug)]
 pub struct MotionSensorHandler {
