@@ -276,7 +276,7 @@ impl RouteHandler for DiscordHandler {
                     Some(format!("{ANNOUNCEMENT} All blinds are closing"))
                 }
                 "open blinds" => {
-                    self.get::<BlindsService>()?.close_both().await.unwrap();
+                    self.get::<BlindsService>()?.open_both().await.unwrap();
                     Some(format!("{ANNOUNCEMENT} All blinds are opening"))
                 }
                 _ => None,
