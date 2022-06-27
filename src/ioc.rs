@@ -27,3 +27,25 @@ impl IocContainer {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    struct A;
+
+    #[test]
+    fn simple_ioc() {
+        let container = IocContainer::default();
+        container.register(A);
+        let a = container.get::<A>();
+        assert!(a.is_some());
+    }
+
+    #[test]
+    fn fail_on_unregistered_type() {
+        let container = IocContainer::default();
+        let not_a = container.get::<A>();
+        assert!(not_a.is_none())
+    }
+}
