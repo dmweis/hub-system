@@ -12,7 +12,7 @@ use configuration::get_configuration;
 use log::*;
 use simplelog::*;
 use speech_service::SpeechService;
-use std::{io::Read, path::PathBuf};
+use std::path::PathBuf;
 use structopt::StructOpt;
 
 #[derive(StructOpt, Debug)]
@@ -42,11 +42,7 @@ async fn main() -> anyhow::Result<()> {
 
     speech_service.say_cheerful("Hub system online").await?;
 
-    tokio::task::spawn_blocking(move || {
-        info!("Press Enter to exit...");
-        let _ = std::io::stdin().read(&mut [0]).unwrap();
-    })
-    .await?;
+    std::future::pending::<()>().await;
     Ok(())
 }
 
