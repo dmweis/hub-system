@@ -66,16 +66,20 @@
 <span id="61">61</span>
 <span id="62">62</span>
 <span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
 <span class="comment">// TODO(David): Remove this?</span>
 
+<span class="kw">mod</span> <span class="ident">blinds_service</span>;
 <span class="kw">mod</span> <span class="ident">configuration</span>;
 <span class="kw">mod</span> <span class="ident">ioc</span>;
 <span class="kw">mod</span> <span class="ident">mqtt_server</span>;
 <span class="kw">mod</span> <span class="ident">routes</span>;
 <span class="kw">mod</span> <span class="ident">speech_service</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ioc::IocContainer</span>, <span class="ident">mqtt_server::start_mqtt_service</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">blinds_service::BlindsService</span>, <span class="ident">ioc::IocContainer</span>, <span class="ident">mqtt_server::start_mqtt_service</span>};
 <span class="kw">use</span> <span class="ident">configuration::get_configuration</span>;
 <span class="kw">use</span> <span class="ident">log</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">simplelog</span>::<span class="kw-2">*</span>;
@@ -104,11 +108,13 @@
     <span class="kw">let</span> <span class="ident">container</span> <span class="op">=</span> <span class="ident">IocContainer::default</span>();
 
     <span class="kw">let</span> <span class="ident">mqtt_client</span> <span class="op">=</span> <span class="ident">start_mqtt_service</span>(<span class="ident">app_config</span>, <span class="ident">container</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">speech_service</span> <span class="op">=</span> <span class="ident">SpeechService::new</span>(<span class="ident">mqtt_client</span>);
 
-    <span class="ident">container</span>.<span class="ident">register</span>(<span class="ident">speech_service</span>.<span class="ident">clone</span>());
-
+    <span class="kw">let</span> <span class="ident">speech_service</span> <span class="op">=</span> <span class="ident">SpeechService::new</span>(<span class="ident">mqtt_client</span>.<span class="ident">clone</span>());
     <span class="ident">speech_service</span>.<span class="ident">say_cheerful</span>(<span class="string">&quot;Hub system online&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="ident">container</span>.<span class="ident">register</span>(<span class="ident">speech_service</span>);
+
+    <span class="kw">let</span> <span class="ident">blinds_service</span> <span class="op">=</span> <span class="ident">BlindsService::new</span>(<span class="ident">mqtt_client</span>);
+    <span class="ident">container</span>.<span class="ident">register</span>(<span class="ident">blinds_service</span>);
 
     <span class="ident">std::future::pending</span>::<span class="op">&lt;</span>()<span class="op">&gt;</span>().<span class="kw">await</span>;
     <span class="prelude-val">Ok</span>(())
