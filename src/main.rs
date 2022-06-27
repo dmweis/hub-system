@@ -2,16 +2,18 @@
 // TODO(David): Remove this?
 
 mod configuration;
-mod mqtt;
+mod mqtt_server;
+mod routes;
 mod speech_service;
 
 use configuration::get_configuration;
 use log::*;
 use simplelog::*;
+use speech_service::SpeechService;
 use std::{io::Read, path::PathBuf};
 use structopt::StructOpt;
 
-use crate::{mqtt::start_mqtt_service, speech_service::SpeechService};
+use crate::mqtt_server::start_mqtt_service;
 
 #[derive(StructOpt, Debug)]
 #[structopt(
