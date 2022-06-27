@@ -300,6 +300,13 @@
 <span id="295">295</span>
 <span id="296">296</span>
 <span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">blinds_service::BlindsService</span>, <span class="ident">discord_service::DiscordService</span>, <span class="ident">ioc::IocContainer</span>,
     <span class="ident">speech_service::SpeechService</span>,
@@ -350,24 +357,31 @@
 
 <span class="attribute">#[<span class="ident">async_trait</span>]</span>
 <span class="kw">impl</span> <span class="ident">RouteHandler</span> <span class="kw">for</span> <span class="ident">MotionSensorHandler</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">topic</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">content</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span>(), <span class="ident">RouterError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">motion_sensor_id</span> <span class="op">=</span> <span class="ident">topic</span>.<span class="ident">split</span>(<span class="string">&#39;/&#39;</span>).<span class="ident">last</span>().<span class="ident">unwrap_or</span>(<span class="string">&quot;Not available&quot;</span>);
-        <span class="macro">info!</span>(<span class="string">&quot;Handling motion sensor data&quot;</span>);
-        <span class="kw">let</span> <span class="ident">motion_sensor</span>: <span class="ident">MotionSensorData</span> <span class="op">=</span>
-            <span class="ident">serde_json::from_slice</span>(<span class="ident">content</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">RouterError::HandlerError</span>(<span class="ident">err</span>.<span class="ident">into</span>()))<span class="question-mark">?</span>;
-
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">motion_sensor</span>.<span class="ident">occupancy</span> {
-            <span class="macro">format!</span>(<span class="string">&quot;{ANNOUNCEMENT} Motion sensor {motion_sensor_id} triggered&quot;</span>)
-        } <span class="kw">else</span> {
-            <span class="macro">format!</span>(<span class="string">&quot;{ANNOUNCEMENT} Motion sensor {motion_sensor_id} detects no movement&quot;</span>)
-        };
-
-        <span class="self">self</span>.<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">SpeechService</span><span class="op">&gt;</span>()<span class="question-mark">?</span>
-            .<span class="ident">say_cheerful</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>)
-            .<span class="kw">await</span>
-            .<span class="ident">unwrap</span>();
-
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">call</span>(
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">_topic</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">_content</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
+    ) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span>(), <span class="ident">RouterError</span><span class="op">&gt;</span> {
+        <span class="macro">info!</span>(<span class="string">&quot;Motion sensor silenced&quot;</span>);
         <span class="prelude-val">Ok</span>(())
+
+        <span class="comment">// let motion_sensor_id = topic.split(&#39;/&#39;).last().unwrap_or(&quot;Not available&quot;);</span>
+        <span class="comment">// info!(&quot;Handling motion sensor data&quot;);</span>
+        <span class="comment">// let motion_sensor: MotionSensorData =</span>
+        <span class="comment">//     serde_json::from_slice(content).map_err(|err| RouterError::HandlerError(err.into()))?;</span>
+
+        <span class="comment">// let message = if motion_sensor.occupancy {</span>
+        <span class="comment">//     format!(&quot;{ANNOUNCEMENT} Motion sensor {motion_sensor_id} triggered&quot;)</span>
+        <span class="comment">// } else {</span>
+        <span class="comment">//     format!(&quot;{ANNOUNCEMENT} Motion sensor {motion_sensor_id} detects no movement&quot;)</span>
+        <span class="comment">// };</span>
+
+        <span class="comment">// self.get::&lt;SpeechService&gt;()?</span>
+        <span class="comment">//     .say_cheerful(&amp;message)</span>
+        <span class="comment">//     .await</span>
+        <span class="comment">//     .unwrap();</span>
+
+        <span class="comment">// Ok(())</span>
     }
 }
 
