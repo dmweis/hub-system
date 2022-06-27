@@ -307,6 +307,11 @@
 <span id="302">302</span>
 <span id="303">303</span>
 <span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">blinds_service::BlindsService</span>, <span class="ident">discord_service::DiscordService</span>, <span class="ident">ioc::IocContainer</span>,
     <span class="ident">speech_service::SpeechService</span>,
@@ -448,7 +453,12 @@
         <span class="self">self</span>.<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">SpeechService</span><span class="op">&gt;</span>()<span class="question-mark">?</span>
             .<span class="ident">say_cheerful</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>)
             .<span class="kw">await</span>
-            .<span class="ident">unwrap</span>();
+            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">RouterError::HandlerError</span>(<span class="ident">err</span>.<span class="ident">into</span>()))<span class="question-mark">?</span>;
+
+        <span class="self">self</span>.<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">DiscordService</span><span class="op">&gt;</span>()<span class="question-mark">?</span>
+            .<span class="ident">send_notification</span>(<span class="ident">message</span>)
+            .<span class="kw">await</span>
+            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">RouterError::HandlerError</span>(<span class="ident">err</span>.<span class="ident">into</span>()))<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
