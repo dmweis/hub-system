@@ -7,6 +7,7 @@ mqtt:
 alarm_config:
   save_file_path: "/var/lib/home_speak/saved_alarms.json"
 discord_bot:
+  whole_sum_boi_base_topic: "whole_sum_boi"
   notification_discord_channel: 0
   spam_channel_id: 0
   channels:
