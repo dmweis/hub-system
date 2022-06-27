@@ -110,7 +110,16 @@
 <span id="105">105</span>
 <span id="106">106</span>
 <span id="107">107</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::routes</span>::{<span class="ident">DoorSensorHandler</span>, <span class="ident">MotionSensorHandler</span>, <span class="ident">SwitchHandler</span>};
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::routes</span>::{<span class="ident">DiscordHandler</span>, <span class="ident">DoorSensorHandler</span>, <span class="ident">MotionSensorHandler</span>, <span class="ident">SwitchHandler</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">configuration::AppConfig</span>, <span class="ident">ioc::IocContainer</span>};
 <span class="kw">use</span> <span class="ident">log</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">mqtt_router::Router</span>;
@@ -159,6 +168,8 @@
         }
     });
 
+    <span class="kw">let</span> <span class="ident">whole_sum_boi_base_topic</span> <span class="op">=</span> <span class="ident">app_config</span>.<span class="ident">discord_bot</span>.<span class="ident">whole_sum_boi_base_topic</span>;
+
     <span class="ident">tokio::spawn</span>({
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">clone</span>();
         <span class="kw">async</span> <span class="kw">move</span> {
@@ -176,6 +187,13 @@
                 .<span class="ident">add_handler</span>(
                     <span class="string">&quot;zigbee2mqtt/motion/#&quot;</span>,
                     <span class="ident">MotionSensorHandler::new</span>(<span class="ident">ioc</span>.<span class="ident">clone</span>()),
+                )
+                .<span class="ident">unwrap</span>();
+
+            <span class="ident">router</span>
+                .<span class="ident">add_handler</span>(
+                    <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}/new_message/v1&quot;</span>, <span class="ident">whole_sum_boi_base_topic</span>),
+                    <span class="ident">DiscordHandler::new</span>(<span class="ident">ioc</span>.<span class="ident">clone</span>()),
                 )
                 .<span class="ident">unwrap</span>();
 

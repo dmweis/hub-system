@@ -67,9 +67,18 @@
 <span id="62">62</span>
 <span id="63">63</span>
 <span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">log</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">serde::Deserialize</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">path::PathBuf</span>, <span class="ident">str</span>};
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">path::PathBuf</span>, <span class="ident">str</span>};
 
 <span class="doccomment">/// Use default config if no path is provided</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_configuration</span>(<span class="ident">config</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AppConfig</span>, <span class="ident">anyhow::Error</span><span class="op">&gt;</span> {
@@ -99,6 +108,7 @@
     <span class="kw">pub</span> <span class="ident">server_config</span>: <span class="ident">ServerConfig</span>,
     <span class="kw">pub</span> <span class="ident">alarm_config</span>: <span class="ident">AlarmConfig</span>,
     <span class="kw">pub</span> <span class="ident">mqtt</span>: <span class="ident">MqttConfig</span>,
+    <span class="kw">pub</span> <span class="ident">discord_bot</span>: <span class="ident">DiscordBotConfig</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
@@ -130,6 +140,14 @@
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;default_mqtt_port&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">broker_port</span>: <span class="ident">u16</span>,
     <span class="kw">pub</span> <span class="ident">client_id</span>: <span class="ident">String</span>,
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DiscordBotConfig</span> {
+    <span class="kw">pub</span> <span class="ident">whole_sum_boi_base_topic</span>: <span class="ident">String</span>,
+    <span class="kw">pub</span> <span class="ident">notification_discord_channel</span>: <span class="ident">u64</span>,
+    <span class="kw">pub</span> <span class="ident">spam_channel_id</span>: <span class="ident">u64</span>,
+    <span class="kw">pub</span> <span class="ident">channels</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">u64</span><span class="op">&gt;</span>,
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="hub_system" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>
