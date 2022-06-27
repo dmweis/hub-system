@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["main",""],["setup_logging",""]],"mod":[["configuration",""],["mqtt",""],["speech_service",""]],"struct":[["Opts",""]]});
+initSidebarItems({"fn":[["main",""],["setup_logging",""]],"mod":[["configuration",""],["mqtt_server",""],["routes",""],["speech_service",""]],"struct":[["Opts",""]]});
