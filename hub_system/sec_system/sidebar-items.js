@@ -1,1 +1,1 @@
-initSidebarItems({"constant":[["ANNOUNCEMENT_PREAMBLE",""]],"enum":[["MotionSensorState",""],["SecSystemState",""]],"struct":[["SecSystem",""]]});
+initSidebarItems({"constant":[["ANNOUNCEMENT_PREAMBLE",""]],"enum":[["DoorSensorState",""],["MotionSensorState",""],["SecSystemState",""]],"struct":[["SecSystem",""]]});

@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["DoorSensor",""],["DoorSensorHandler",""]]});
+initSidebarItems({"struct":[["DoorSensorData",""],["DoorSensorHandler",""]]});

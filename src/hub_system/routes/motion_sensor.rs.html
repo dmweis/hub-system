@@ -56,8 +56,6 @@
 <span id="51">51</span>
 <span id="52">52</span>
 <span id="53">53</span>
-<span id="54">54</span>
-<span id="55">55</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sec_system::SecSystem</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Injected</span>, <span class="ident">IocContainer</span>};
@@ -103,12 +101,10 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MotionSensorData</span> {
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
     <span class="kw">pub</span> <span class="ident">battery</span>: <span class="ident">f32</span>,
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
     <span class="kw">pub</span> <span class="ident">battery_low</span>: <span class="ident">bool</span>,
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
     <span class="kw">pub</span> <span class="ident">linkquality</span>: <span class="ident">f32</span>,
     <span class="kw">pub</span> <span class="ident">occupancy</span>: <span class="ident">bool</span>,
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
     <span class="kw">pub</span> <span class="ident">tamper</span>: <span class="ident">bool</span>,
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
     <span class="kw">pub</span> <span class="ident">voltage</span>: <span class="ident">f32</span>,
