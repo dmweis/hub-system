@@ -127,6 +127,9 @@
 <span id="122">122</span>
 <span id="123">123</span>
 <span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Injected</span>, <span class="ident">ANNOUNCEMENT</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">blinds_service::BlindsService</span>, <span class="ident">discord_service::DiscordService</span>, <span class="ident">ioc::IocContainer</span>,
@@ -228,7 +231,10 @@
                         .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">RouterError::HandlerError</span>(<span class="ident">err</span>.<span class="ident">into</span>()))<span class="question-mark">?</span>;
                 }
                 <span class="ident">message</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;Unknown command \&quot;{}\&quot;&quot;</span>, <span class="ident">message</span>);
+                    <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
+                        <span class="string">&quot;Unknown command \&quot;{}\&quot;\ntype `help` for list of commands&quot;</span>,
+                        <span class="ident">message</span>
+                    );
                     <span class="macro">info!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">message</span>);
                     <span class="self">self</span>.<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">DiscordService</span><span class="op">&gt;</span>()<span class="question-mark">?</span>
                         .<span class="ident">send_notification</span>(<span class="ident">message</span>)
