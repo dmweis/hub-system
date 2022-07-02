@@ -202,6 +202,19 @@
 <span id="197">197</span>
 <span id="198">198</span>
 <span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">sync::Mutex</span>};
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -392,7 +405,20 @@
                         .<span class="ident">send_notification</span>(<span class="ident">message</span>)
                         .<span class="kw">await</span><span class="question-mark">?</span>;
                 }
-                (<span class="ident">old</span>, <span class="ident">new</span>) =&gt; <span class="macro">info!</span>(<span class="string">&quot;Unhandled motion sensors transition {:?} =&gt; {:?}&quot;</span>, <span class="ident">old</span>, <span class="ident">new</span>),
+                (<span class="ident">MotionSensorState::Occupied</span>, <span class="ident">MotionSensorState::Occupied</span>) =&gt; {
+                    <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
+                        <span class="string">&quot;{} Motion sensor \&quot;{}\&quot; still detection occupancy&quot;</span>,
+                        <span class="ident">ANNOUNCEMENT_PREAMBLE</span>, <span class="ident">sensors_id</span>
+                    );
+                    <span class="self">self</span>.<span class="ident">ioc</span>
+                        .<span class="ident">service</span>::<span class="op">&lt;</span><span class="ident">SpeechService</span><span class="op">&gt;</span>()<span class="question-mark">?</span>
+                        .<span class="ident">say_angry</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>)
+                        .<span class="kw">await</span><span class="question-mark">?</span>;
+                    <span class="self">self</span>.<span class="ident">ioc</span>
+                        .<span class="ident">service</span>::<span class="op">&lt;</span><span class="ident">DiscordService</span><span class="op">&gt;</span>()<span class="question-mark">?</span>
+                        .<span class="ident">send_notification</span>(<span class="ident">message</span>)
+                        .<span class="kw">await</span><span class="question-mark">?</span>;
+                }
             }
         } <span class="kw">else</span> {
             <span class="macro">info!</span>(<span class="string">&quot;Skipping motion sensor data in disarmed state&quot;</span>);
