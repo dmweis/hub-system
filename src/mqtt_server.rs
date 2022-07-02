@@ -1,4 +1,4 @@
-use super::routes::{DiscordHandler, DoorSensorHandler, MotionSensorHandler, SwitchHandler};
+use crate::routes::{DiscordHandler, DoorSensorHandler, MotionSensorHandler, SwitchHandler};
 use crate::{configuration::AppConfig, ioc::IocContainer};
 use log::*;
 use mqtt_router::Router;
