@@ -55,11 +55,11 @@ impl RouteHandler for DiscordHandler {
             match received_message.content.to_ascii_lowercase().as_str() {
                 "help" => {
                     let message = "Commands:
-help: this
-disarm: disarm Sec System
-arm: arm Sec System
-close blinds: close all blinds
-open blinds: open all blinds
+`help`: this
+`disarm`: disarm Sec System
+`arm`: arm Sec System
+`close blinds`: close all blinds
+`open blinds`: open all blinds
                     ";
                     self.get::<DiscordService>()?
                         .send_notification(message.to_owned())
