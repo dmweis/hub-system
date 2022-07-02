@@ -1,7 +1,9 @@
 use std::{collections::HashMap, sync::Mutex};
 
 use crate::{
-    discord_service::DiscordService, ioc::IocContainer, routes::MotionSensorData,
+    discord_service::DiscordService,
+    ioc::IocContainer,
+    routes::{DoorSensorData, MotionSensorData},
     speech_service::SpeechService,
 };
 use anyhow::Result;
@@ -31,10 +33,27 @@ impl MotionSensorState {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum DoorSensorState {
+    Open,
+    Closed,
+}
+
+impl DoorSensorState {
+    fn from_data(sensor_data: &DoorSensorData) -> Self {
+        if sensor_data.contact {
+            DoorSensorState::Closed
+        } else {
+            DoorSensorState::Open
+        }
+    }
+}
+
 pub struct SecSystem {
     ioc: IocContainer,
     state: Mutex<SecSystemState>,
     motion_sensor_state: Mutex<HashMap<String, MotionSensorState>>,
+    door_sensor_state: Mutex<HashMap<String, DoorSensorState>>,
 }
 
 impl SecSystem {
@@ -43,13 +62,18 @@ impl SecSystem {
             ioc,
             state: Mutex::new(SecSystemState::Disarmed),
             motion_sensor_state: Mutex::new(HashMap::new()),
+            door_sensor_state: Mutex::new(HashMap::new()),
         }
     }
 
-    fn clear_motion_data(&self) {
+    fn clear_sensor_data(&self) {
         let mut motion_sensor_state = self.motion_sensor_state.lock().unwrap();
         for value in motion_sensor_state.values_mut() {
             *value = MotionSensorState::Unoccupied;
+        }
+        let mut door_sensor_state = self.door_sensor_state.lock().unwrap();
+        for value in door_sensor_state.values_mut() {
+            *value = DoorSensorState::Closed;
         }
     }
 
@@ -70,7 +94,7 @@ impl SecSystem {
 
         const MESSAGE: &str = "Arming Security System";
 
-        self.clear_motion_data();
+        self.clear_sensor_data();
 
         self.ioc
             .service::<SpeechService>()?
@@ -209,6 +233,107 @@ impl SecSystem {
             }
         } else {
             info!("Skipping motion sensor data in disarmed state");
+        }
+
+        Ok(())
+    }
+
+    pub async fn handle_door_sensor_data(
+        &self,
+        sensor_data: &DoorSensorData,
+        sensor_topic: &str,
+    ) -> Result<()> {
+        let new_state = DoorSensorState::from_data(sensor_data);
+
+        let previous_state = self
+            .door_sensor_state
+            .lock()
+            .unwrap()
+            .insert(sensor_topic.to_owned(), new_state)
+            .unwrap_or(DoorSensorState::Closed);
+
+        let sensors_id = sensor_topic.split('/').last().unwrap_or("unknown");
+
+        info!(
+            "Door sensor \"{}\" old state: {:?} new state: {:?}",
+            sensors_id, previous_state, new_state
+        );
+
+        if sensor_data.battery_low {
+            let message = format!(
+                "{} Batter low in door sensor \"{}\"",
+                ANNOUNCEMENT_PREAMBLE, sensors_id
+            );
+            self.ioc
+                .service::<SpeechService>()?
+                .say_plain(&message)
+                .await?;
+            self.ioc
+                .service::<DiscordService>()?
+                .send_notification(message)
+                .await?;
+        }
+
+        if sensor_data.tamper {
+            let message = format!(
+                "{} Tampering detected in door sensor \"{}\"",
+                ANNOUNCEMENT_PREAMBLE, sensors_id
+            );
+            self.ioc
+                .service::<SpeechService>()?
+                .say_angry(&message)
+                .await?;
+            self.ioc
+                .service::<DiscordService>()?
+                .send_notification(message)
+                .await?;
+        }
+
+        match (previous_state, new_state) {
+            (DoorSensorState::Closed, DoorSensorState::Closed) => (),
+            (DoorSensorState::Closed, DoorSensorState::Open) => {
+                info!("Handling door sensor transition to open");
+                let message = format!(
+                    "{} Door sensor \"{}\" has been opened",
+                    ANNOUNCEMENT_PREAMBLE, sensors_id
+                );
+                self.ioc
+                    .service::<SpeechService>()?
+                    .say_angry(&message)
+                    .await?;
+                self.ioc
+                    .service::<DiscordService>()?
+                    .send_notification(message)
+                    .await?;
+            }
+            (DoorSensorState::Open, DoorSensorState::Closed) => {
+                let message = format!(
+                    "{} Door sensor \"{}\" closed",
+                    ANNOUNCEMENT_PREAMBLE, sensors_id
+                );
+                self.ioc
+                    .service::<SpeechService>()?
+                    .say_plain(&message)
+                    .await?;
+                self.ioc
+                    .service::<DiscordService>()?
+                    .send_notification(message)
+                    .await?;
+            }
+            (DoorSensorState::Open, DoorSensorState::Open) => {
+                let message = format!(
+                    "{} Door sensor \"{}\" is still open",
+                    ANNOUNCEMENT_PREAMBLE, sensors_id
+                );
+                self.ioc
+                    .service::<SpeechService>()?
+                    .say_angry(&message)
+                    .await?;
+                self.ioc
+                    .service::<DiscordService>()?
+                    .send_notification(message)
+                    .await?;
+            }
         }
 
         Ok(())

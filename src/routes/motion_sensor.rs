@@ -43,12 +43,10 @@ impl RouteHandler for MotionSensorHandler {
 pub struct MotionSensorData {
     #[allow(dead_code)]
     pub battery: f32,
-    #[allow(dead_code)]
     pub battery_low: bool,
     #[allow(dead_code)]
     pub linkquality: f32,
     pub occupancy: bool,
-    #[allow(dead_code)]
     pub tamper: bool,
     #[allow(dead_code)]
     pub voltage: f32,
