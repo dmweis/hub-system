@@ -3,6 +3,15 @@ use std::{
     collections::HashMap,
     sync::{Arc, Mutex},
 };
+use thiserror::Error;
+
+#[derive(Error, Debug)]
+pub enum IocContainerError {
+    #[error("service not available in container")]
+    ServiceNotAvailable,
+    #[error("failed to downcast service")]
+    FailedToDowncast,
+}
 
 type Handle = Arc<dyn Any + Send + Sync>;
 
@@ -24,6 +33,18 @@ impl IocContainer {
             handle.downcast::<T>().ok()
         } else {
             None
+        }
+    }
+
+    pub fn service<T: Any + Send + Sync>(&self) -> Result<Arc<T>, IocContainerError> {
+        let type_id = TypeId::of::<T>();
+        if let Some(object) = self.map.lock().unwrap().get(&type_id) {
+            let handle = object.clone();
+            handle
+                .downcast::<T>()
+                .map_err(|_| IocContainerError::FailedToDowncast)
+        } else {
+            Err(IocContainerError::ServiceNotAvailable)
         }
     }
 }

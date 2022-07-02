@@ -36,19 +36,21 @@ async fn main() -> anyhow::Result<()> {
     info!("Starting Hub System");
     let app_config = get_configuration(opts.config)?;
 
+    // build services
     let container = IocContainer::default();
 
-    let mqtt_client = start_mqtt_service(app_config.clone(), container.clone())?;
+    let speech_service = SpeechService::new(container.clone());
+    container.register(speech_service.clone());
 
-    let speech_service = SpeechService::new(mqtt_client.clone());
-    speech_service.say_cheerful("Hub system online").await?;
-    container.register(speech_service);
-
-    let blinds_service = BlindsService::new(mqtt_client.clone());
+    let blinds_service = BlindsService::new(container.clone());
     container.register(blinds_service);
 
-    let discord_service = DiscordService::new(mqtt_client.clone(), app_config.discord_bot.clone());
+    let discord_service = DiscordService::new(container.clone(), app_config.discord_bot.clone());
     container.register(discord_service);
+
+    start_mqtt_service(app_config.clone(), container.clone())?;
+
+    speech_service.say_cheerful("Hub system online").await?;
 
     std::future::pending::<()>().await;
     Ok(())

@@ -2,14 +2,16 @@ use anyhow::Result;
 use rumqttc::AsyncClient;
 use serde::Serialize;
 
+use crate::ioc::IocContainer;
+
 #[derive(Debug, Clone)]
 pub struct SpeechService {
-    mqtt_client: AsyncClient,
+    ioc: IocContainer,
 }
 
 impl SpeechService {
-    pub fn new(mqtt_client: AsyncClient) -> Self {
-        Self { mqtt_client }
+    pub fn new(ioc: IocContainer) -> Self {
+        Self { ioc }
     }
 
     pub async fn say(&self, message: &str, style: AzureVoiceStyle) -> Result<()> {
@@ -19,7 +21,8 @@ impl SpeechService {
             template: false,
         };
         let json = serde_json::to_string(&message)?;
-        self.mqtt_client
+        self.ioc
+            .service::<AsyncClient>()?
             .publish("home_speak/say", rumqttc::QoS::AtMostOnce, false, json)
             .await?;
         Ok(())

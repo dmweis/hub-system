@@ -1,14 +1,16 @@
 use anyhow::Result;
 use rumqttc::AsyncClient;
 
+use crate::ioc::IocContainer;
+
 #[derive(Debug, Clone)]
 pub struct BlindsService {
-    mqtt_client: AsyncClient,
+    ioc: IocContainer,
 }
 
 impl BlindsService {
-    pub fn new(mqtt_client: AsyncClient) -> Self {
-        Self { mqtt_client }
+    pub fn new(ioc: IocContainer) -> Self {
+        Self { ioc }
     }
 
     pub async fn open_both(&self) -> Result<()> {
@@ -24,7 +26,8 @@ impl BlindsService {
     }
 
     pub async fn open_bedroom(&self) -> Result<()> {
-        self.mqtt_client
+        self.ioc
+            .service::<AsyncClient>()?
             .publish(
                 "bedroom/blinds/open",
                 rumqttc::QoS::AtMostOnce,
@@ -36,7 +39,8 @@ impl BlindsService {
     }
 
     pub async fn open_living_room(&self) -> Result<()> {
-        self.mqtt_client
+        self.ioc
+            .service::<AsyncClient>()?
             .publish(
                 "living_room/blinds/open",
                 rumqttc::QoS::AtMostOnce,
@@ -48,7 +52,8 @@ impl BlindsService {
     }
 
     pub async fn close_bedroom(&self) -> Result<()> {
-        self.mqtt_client
+        self.ioc
+            .service::<AsyncClient>()?
             .publish(
                 "bedroom/blinds/close",
                 rumqttc::QoS::AtMostOnce,
@@ -60,7 +65,8 @@ impl BlindsService {
     }
 
     pub async fn close_living_room(&self) -> Result<()> {
-        self.mqtt_client
+        self.ioc
+            .service::<AsyncClient>()?
             .publish(
                 "living_room/blinds/close",
                 rumqttc::QoS::AtMostOnce,
