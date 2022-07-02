@@ -10,7 +10,7 @@ use log::*;
 const ANNOUNCEMENT_PREAMBLE: &str = "Security System announcement.";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum SecSystemState {
+pub enum SecSystemState {
     Disarmed,
     Armed,
 }
@@ -51,6 +51,10 @@ impl SecSystem {
         for value in motion_sensor_state.values_mut() {
             *value = MotionSensorState::Unoccupied;
         }
+    }
+
+    pub fn state(&self) -> SecSystemState {
+        *self.state.lock().unwrap()
     }
 
     pub async fn arm(&self) -> Result<()> {

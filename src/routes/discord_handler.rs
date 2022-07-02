@@ -1,7 +1,10 @@
 use super::{Injected, ANNOUNCEMENT};
 use crate::{
-    blinds_service::BlindsService, discord_service::DiscordService, ioc::IocContainer,
-    sec_system::SecSystem, speech_service::SpeechService,
+    blinds_service::BlindsService,
+    discord_service::DiscordService,
+    ioc::IocContainer,
+    sec_system::{SecSystem, SecSystemState},
+    speech_service::SpeechService,
 };
 
 use async_trait::async_trait;
@@ -58,6 +61,7 @@ impl RouteHandler for DiscordHandler {
 `help`: this
 `disarm`: disarm Sec System
 `arm`: arm Sec System
+`state`: get state of sec system
 `close blinds`: close all blinds
 `open blinds`: open all blinds
                     ";
@@ -75,6 +79,17 @@ impl RouteHandler for DiscordHandler {
                 "arm" => {
                     self.get::<SecSystem>()?
                         .arm()
+                        .await
+                        .map_err(|err| RouterError::HandlerError(err.into()))?;
+                }
+                "state" => {
+                    let sec_system_state = self.get::<SecSystem>()?.state();
+                    let message = match sec_system_state {
+                        SecSystemState::Armed => "Sec System is armed",
+                        SecSystemState::Disarmed => "Sec System is disarmed",
+                    };
+                    self.get::<DiscordService>()?
+                        .send_notification(message.to_owned())
                         .await
                         .map_err(|err| RouterError::HandlerError(err.into()))?;
                 }
@@ -98,6 +113,7 @@ impl RouteHandler for DiscordHandler {
                         .await
                         .map_err(|err| RouterError::HandlerError(err.into()))?;
                 }
+
                 message => {
                     let message = format!(
                         "Unknown command \"{}\"\ntype `help` for list of commands",
