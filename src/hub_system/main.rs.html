@@ -76,6 +76,14 @@
 <span id="71">71</span>
 <span id="72">72</span>
 <span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
 <span class="comment">// TODO(David): Remove this?</span>
 
@@ -85,12 +93,14 @@
 <span class="kw">mod</span> <span class="ident">ioc</span>;
 <span class="kw">mod</span> <span class="ident">mqtt_server</span>;
 <span class="kw">mod</span> <span class="ident">routes</span>;
+<span class="kw">mod</span> <span class="ident">sec_system</span>;
 <span class="kw">mod</span> <span class="ident">speech_service</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">blinds_service::BlindsService</span>, <span class="ident">ioc::IocContainer</span>, <span class="ident">mqtt_server::start_mqtt_service</span>};
 <span class="kw">use</span> <span class="ident">configuration::get_configuration</span>;
 <span class="kw">use</span> <span class="ident">discord_service::DiscordService</span>;
 <span class="kw">use</span> <span class="ident">log</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">sec_system::SecSystem</span>;
 <span class="kw">use</span> <span class="ident">simplelog</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">speech_service::SpeechService</span>;
 <span class="kw">use</span> <span class="ident">std::path::PathBuf</span>;
@@ -124,11 +134,17 @@
     <span class="ident">container</span>.<span class="ident">register</span>(<span class="ident">blinds_service</span>);
 
     <span class="kw">let</span> <span class="ident">discord_service</span> <span class="op">=</span> <span class="ident">DiscordService::new</span>(<span class="ident">container</span>.<span class="ident">clone</span>(), <span class="ident">app_config</span>.<span class="ident">discord_bot</span>.<span class="ident">clone</span>());
-    <span class="ident">container</span>.<span class="ident">register</span>(<span class="ident">discord_service</span>);
+    <span class="ident">container</span>.<span class="ident">register</span>(<span class="ident">discord_service</span>.<span class="ident">clone</span>());
+
+    <span class="kw">let</span> <span class="ident">sec_system</span> <span class="op">=</span> <span class="ident">SecSystem::new</span>(<span class="ident">container</span>.<span class="ident">clone</span>());
+    <span class="ident">container</span>.<span class="ident">register</span>(<span class="ident">sec_system</span>);
 
     <span class="ident">start_mqtt_service</span>(<span class="ident">app_config</span>.<span class="ident">clone</span>(), <span class="ident">container</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>;
 
     <span class="ident">speech_service</span>.<span class="ident">say_cheerful</span>(<span class="string">&quot;Hub system online&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="ident">discord_service</span>
+        .<span class="ident">send_notification</span>(<span class="string">&quot;Hub system online&quot;</span>.<span class="ident">to_owned</span>())
+        .<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="ident">std::future::pending</span>::<span class="op">&lt;</span>()<span class="op">&gt;</span>().<span class="kw">await</span>;
     <span class="prelude-val">Ok</span>(())
