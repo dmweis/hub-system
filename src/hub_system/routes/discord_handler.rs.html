@@ -130,10 +130,29 @@
 <span id="125">125</span>
 <span id="126">126</span>
 <span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Injected</span>, <span class="ident">ANNOUNCEMENT</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">blinds_service::BlindsService</span>, <span class="ident">discord_service::DiscordService</span>, <span class="ident">ioc::IocContainer</span>,
-    <span class="ident">sec_system::SecSystem</span>, <span class="ident">speech_service::SpeechService</span>,
+    <span class="ident">blinds_service::BlindsService</span>,
+    <span class="ident">discord_service::DiscordService</span>,
+    <span class="ident">ioc::IocContainer</span>,
+    <span class="ident">sec_system</span>::{<span class="ident">SecSystem</span>, <span class="ident">SecSystemState</span>},
+    <span class="ident">speech_service::SpeechService</span>,
 };
 
 <span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
@@ -190,6 +209,7 @@
 `help`: this
 `disarm`: disarm Sec System
 `arm`: arm Sec System
+`state`: get state of sec system
 `close blinds`: close all blinds
 `open blinds`: open all blinds
                     &quot;</span>;
@@ -207,6 +227,17 @@
                 <span class="string">&quot;arm&quot;</span> =&gt; {
                     <span class="self">self</span>.<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">SecSystem</span><span class="op">&gt;</span>()<span class="question-mark">?</span>
                         .<span class="ident">arm</span>()
+                        .<span class="kw">await</span>
+                        .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">RouterError::HandlerError</span>(<span class="ident">err</span>.<span class="ident">into</span>()))<span class="question-mark">?</span>;
+                }
+                <span class="string">&quot;state&quot;</span> =&gt; {
+                    <span class="kw">let</span> <span class="ident">sec_system_state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">SecSystem</span><span class="op">&gt;</span>()<span class="question-mark">?</span>.<span class="ident">state</span>();
+                    <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">sec_system_state</span> {
+                        <span class="ident">SecSystemState::Armed</span> =&gt; <span class="string">&quot;Sec System is armed&quot;</span>,
+                        <span class="ident">SecSystemState::Disarmed</span> =&gt; <span class="string">&quot;Sec System is disarmed&quot;</span>,
+                    };
+                    <span class="self">self</span>.<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">DiscordService</span><span class="op">&gt;</span>()<span class="question-mark">?</span>
+                        .<span class="ident">send_notification</span>(<span class="ident">message</span>.<span class="ident">to_owned</span>())
                         .<span class="kw">await</span>
                         .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">RouterError::HandlerError</span>(<span class="ident">err</span>.<span class="ident">into</span>()))<span class="question-mark">?</span>;
                 }
@@ -230,6 +261,7 @@
                         .<span class="kw">await</span>
                         .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">RouterError::HandlerError</span>(<span class="ident">err</span>.<span class="ident">into</span>()))<span class="question-mark">?</span>;
                 }
+
                 <span class="ident">message</span> =&gt; {
                     <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
                         <span class="string">&quot;Unknown command \&quot;{}\&quot;\ntype `help` for list of commands&quot;</span>,
