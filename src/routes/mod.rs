@@ -5,7 +5,7 @@ mod switch_handler;
 
 pub use discord_handler::DiscordHandler;
 pub use door_sensor::DoorSensorHandler;
-pub use motion_sensor::MotionSensorHandler;
+pub use motion_sensor::{MotionSensorData, MotionSensorHandler};
 pub use switch_handler::SwitchHandler;
 
 use crate::ioc::IocContainer;

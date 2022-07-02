@@ -1,7 +1,7 @@
 use super::{Injected, ANNOUNCEMENT};
 use crate::{
     blinds_service::BlindsService, discord_service::DiscordService, ioc::IocContainer,
-    speech_service::SpeechService,
+    sec_system::SecSystem, speech_service::SpeechService,
 };
 
 use async_trait::async_trait;
@@ -52,23 +52,60 @@ impl RouteHandler for DiscordHandler {
         // but fun
         let notification_channel = self.get::<DiscordService>()?.notification_channel();
         if received_message.channel_id == notification_channel {
-            let message = match received_message.content.to_ascii_lowercase().as_str() {
-                "arm" => Some(String::from("Sec System is unavailable.")),
+            match received_message.content.to_ascii_lowercase().as_str() {
+                "help" => {
+                    let message = "Commands:
+help: this
+disarm: disarm Sec System
+arm: arm Sec System
+close blinds: close all blinds
+open blinds: open all blinds
+                    ";
+                    self.get::<DiscordService>()?
+                        .send_notification(message.to_owned())
+                        .await
+                        .map_err(|err| RouterError::HandlerError(err.into()))?;
+                }
+                "disarm" => {
+                    self.get::<SecSystem>()?
+                        .disarm()
+                        .await
+                        .map_err(|err| RouterError::HandlerError(err.into()))?;
+                }
+                "arm" => {
+                    self.get::<SecSystem>()?
+                        .arm()
+                        .await
+                        .map_err(|err| RouterError::HandlerError(err.into()))?;
+                }
                 "close blinds" => {
-                    self.get::<BlindsService>()?.close_both().await.unwrap();
-                    Some(format!("{ANNOUNCEMENT} All blinds are closing"))
+                    self.get::<BlindsService>()?
+                        .close_both()
+                        .await
+                        .map_err(|err| RouterError::HandlerError(err.into()))?;
+                    self.get::<SpeechService>()?
+                        .say_cheerful(&format!("{ANNOUNCEMENT} All blinds are closing"))
+                        .await
+                        .map_err(|err| RouterError::HandlerError(err.into()))?;
                 }
                 "open blinds" => {
-                    self.get::<BlindsService>()?.open_both().await.unwrap();
-                    Some(format!("{ANNOUNCEMENT} All blinds are opening"))
+                    self.get::<BlindsService>()?
+                        .open_both()
+                        .await
+                        .map_err(|err| RouterError::HandlerError(err.into()))?;
+                    self.get::<SpeechService>()?
+                        .say_cheerful(&format!("{ANNOUNCEMENT} All blinds are opening"))
+                        .await
+                        .map_err(|err| RouterError::HandlerError(err.into()))?;
                 }
-                _ => None,
-            };
-            if let Some(message) = message {
-                self.get::<SpeechService>()?
-                    .say_cheerful(&message)
-                    .await
-                    .unwrap();
+                message => {
+                    let message = format!("Unknown command \"{}\"", message);
+                    info!("{}", message);
+                    self.get::<DiscordService>()?
+                        .send_notification(message)
+                        .await
+                        .map_err(|err| RouterError::HandlerError(err.into()))?;
+                }
             }
         }
 
