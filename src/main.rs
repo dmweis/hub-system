@@ -20,9 +20,11 @@ use speech_service::SpeechService;
 use std::path::PathBuf;
 use structopt::StructOpt;
 
+const VERSION: &str = env!("CARGO_PKG_VERSION");
+
 #[derive(StructOpt, Debug)]
 #[structopt(
-    version = "0.1.0",
+    version = VERSION,
     author = "David M. Weis <dweis7@gmail.com>",
     about = "Hub System"
 )]
@@ -35,7 +37,7 @@ struct Opts {
 async fn main() -> anyhow::Result<()> {
     setup_logging();
     let opts = Opts::from_args();
-    info!("Starting Hub System");
+    info!("Starting Hub System version {}", VERSION);
     let app_config = get_configuration(opts.config)?;
 
     // build services
@@ -55,10 +57,9 @@ async fn main() -> anyhow::Result<()> {
 
     start_mqtt_service(app_config.clone(), container.clone())?;
 
-    speech_service.say_cheerful("Hub system online").await?;
-    discord_service
-        .send_notification("Hub system online".to_owned())
-        .await?;
+    let online_message = format!("Hub system version {} is online", VERSION);
+    speech_service.say_cheerful(&online_message).await?;
+    discord_service.send_notification(online_message).await?;
 
     std::future::pending::<()>().await;
     Ok(())
