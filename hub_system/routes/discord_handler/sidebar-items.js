@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["DiscordHandler",""],["ReceivedDiscordMessage","Simplified representation of message for use over mqtt"]]});
