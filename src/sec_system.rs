@@ -188,7 +188,20 @@ impl SecSystem {
                         .send_notification(message)
                         .await?;
                 }
-                (old, new) => info!("Unhandled motion sensors transition {:?} => {:?}", old, new),
+                (MotionSensorState::Occupied, MotionSensorState::Occupied) => {
+                    let message = format!(
+                        "{} Motion sensor \"{}\" still detection occupancy",
+                        ANNOUNCEMENT_PREAMBLE, sensors_id
+                    );
+                    self.ioc
+                        .service::<SpeechService>()?
+                        .say_angry(&message)
+                        .await?;
+                    self.ioc
+                        .service::<DiscordService>()?
+                        .send_notification(message)
+                        .await?;
+                }
             }
         } else {
             info!("Skipping motion sensor data in disarmed state");
