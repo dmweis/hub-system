@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["IocContainer",""]],"type":[["Handle",""]]});
+initSidebarItems({"enum":[["IocContainerError",""]],"struct":[["IocContainer",""]],"type":[["Handle",""]]});

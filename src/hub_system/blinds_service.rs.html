@@ -76,17 +76,25 @@
 <span id="71">71</span>
 <span id="72">72</span>
 <span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">anyhow::Result</span>;
 <span class="kw">use</span> <span class="ident">rumqttc::AsyncClient</span>;
 
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ioc::IocContainer</span>;
+
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BlindsService</span> {
-    <span class="ident">mqtt_client</span>: <span class="ident">AsyncClient</span>,
+    <span class="ident">ioc</span>: <span class="ident">IocContainer</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">BlindsService</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">mqtt_client</span>: <span class="ident">AsyncClient</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">mqtt_client</span> }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">ioc</span>: <span class="ident">IocContainer</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> { <span class="ident">ioc</span> }
     }
 
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">open_both</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
@@ -102,7 +110,8 @@
     }
 
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">open_bedroom</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">mqtt_client</span>
+        <span class="self">self</span>.<span class="ident">ioc</span>
+            .<span class="ident">service</span>::<span class="op">&lt;</span><span class="ident">AsyncClient</span><span class="op">&gt;</span>()<span class="question-mark">?</span>
             .<span class="ident">publish</span>(
                 <span class="string">&quot;bedroom/blinds/open&quot;</span>,
                 <span class="ident">rumqttc::QoS::AtMostOnce</span>,
@@ -114,7 +123,8 @@
     }
 
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">open_living_room</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">mqtt_client</span>
+        <span class="self">self</span>.<span class="ident">ioc</span>
+            .<span class="ident">service</span>::<span class="op">&lt;</span><span class="ident">AsyncClient</span><span class="op">&gt;</span>()<span class="question-mark">?</span>
             .<span class="ident">publish</span>(
                 <span class="string">&quot;living_room/blinds/open&quot;</span>,
                 <span class="ident">rumqttc::QoS::AtMostOnce</span>,
@@ -126,7 +136,8 @@
     }
 
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">close_bedroom</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">mqtt_client</span>
+        <span class="self">self</span>.<span class="ident">ioc</span>
+            .<span class="ident">service</span>::<span class="op">&lt;</span><span class="ident">AsyncClient</span><span class="op">&gt;</span>()<span class="question-mark">?</span>
             .<span class="ident">publish</span>(
                 <span class="string">&quot;bedroom/blinds/close&quot;</span>,
                 <span class="ident">rumqttc::QoS::AtMostOnce</span>,
@@ -138,7 +149,8 @@
     }
 
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">close_living_room</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">mqtt_client</span>
+        <span class="self">self</span>.<span class="ident">ioc</span>
+            .<span class="ident">service</span>::<span class="op">&lt;</span><span class="ident">AsyncClient</span><span class="op">&gt;</span>()<span class="question-mark">?</span>
             .<span class="ident">publish</span>(
                 <span class="string">&quot;living_room/blinds/close&quot;</span>,
                 <span class="ident">rumqttc::QoS::AtMostOnce</span>,
@@ -150,5 +162,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="hub_system" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="hub_system" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
 </body></html>

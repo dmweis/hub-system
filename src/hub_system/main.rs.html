@@ -74,6 +74,8 @@
 <span id="69">69</span>
 <span id="70">70</span>
 <span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
 <span class="comment">// TODO(David): Remove this?</span>
 
@@ -112,19 +114,21 @@
     <span class="macro">info!</span>(<span class="string">&quot;Starting Hub System&quot;</span>);
     <span class="kw">let</span> <span class="ident">app_config</span> <span class="op">=</span> <span class="ident">get_configuration</span>(<span class="ident">opts</span>.<span class="ident">config</span>)<span class="question-mark">?</span>;
 
+    <span class="comment">// build services</span>
     <span class="kw">let</span> <span class="ident">container</span> <span class="op">=</span> <span class="ident">IocContainer::default</span>();
 
-    <span class="kw">let</span> <span class="ident">mqtt_client</span> <span class="op">=</span> <span class="ident">start_mqtt_service</span>(<span class="ident">app_config</span>.<span class="ident">clone</span>(), <span class="ident">container</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">speech_service</span> <span class="op">=</span> <span class="ident">SpeechService::new</span>(<span class="ident">container</span>.<span class="ident">clone</span>());
+    <span class="ident">container</span>.<span class="ident">register</span>(<span class="ident">speech_service</span>.<span class="ident">clone</span>());
 
-    <span class="kw">let</span> <span class="ident">speech_service</span> <span class="op">=</span> <span class="ident">SpeechService::new</span>(<span class="ident">mqtt_client</span>.<span class="ident">clone</span>());
-    <span class="ident">speech_service</span>.<span class="ident">say_cheerful</span>(<span class="string">&quot;Hub system online&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-    <span class="ident">container</span>.<span class="ident">register</span>(<span class="ident">speech_service</span>);
-
-    <span class="kw">let</span> <span class="ident">blinds_service</span> <span class="op">=</span> <span class="ident">BlindsService::new</span>(<span class="ident">mqtt_client</span>.<span class="ident">clone</span>());
+    <span class="kw">let</span> <span class="ident">blinds_service</span> <span class="op">=</span> <span class="ident">BlindsService::new</span>(<span class="ident">container</span>.<span class="ident">clone</span>());
     <span class="ident">container</span>.<span class="ident">register</span>(<span class="ident">blinds_service</span>);
 
-    <span class="kw">let</span> <span class="ident">discord_service</span> <span class="op">=</span> <span class="ident">DiscordService::new</span>(<span class="ident">mqtt_client</span>.<span class="ident">clone</span>(), <span class="ident">app_config</span>.<span class="ident">discord_bot</span>.<span class="ident">clone</span>());
+    <span class="kw">let</span> <span class="ident">discord_service</span> <span class="op">=</span> <span class="ident">DiscordService::new</span>(<span class="ident">container</span>.<span class="ident">clone</span>(), <span class="ident">app_config</span>.<span class="ident">discord_bot</span>.<span class="ident">clone</span>());
     <span class="ident">container</span>.<span class="ident">register</span>(<span class="ident">discord_service</span>);
+
+    <span class="ident">start_mqtt_service</span>(<span class="ident">app_config</span>.<span class="ident">clone</span>(), <span class="ident">container</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>;
+
+    <span class="ident">speech_service</span>.<span class="ident">say_cheerful</span>(<span class="string">&quot;Hub system online&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="ident">std::future::pending</span>::<span class="op">&lt;</span>()<span class="op">&gt;</span>().<span class="kw">await</span>;
     <span class="prelude-val">Ok</span>(())
@@ -146,5 +150,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="hub_system" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0 (fe5b13d68 2022-05-18)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="hub_system" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
 </body></html>
