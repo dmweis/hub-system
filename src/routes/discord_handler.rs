@@ -99,7 +99,10 @@ impl RouteHandler for DiscordHandler {
                         .map_err(|err| RouterError::HandlerError(err.into()))?;
                 }
                 message => {
-                    let message = format!("Unknown command \"{}\"", message);
+                    let message = format!(
+                        "Unknown command \"{}\"\ntype `help` for list of commands",
+                        message
+                    );
                     info!("{}", message);
                     self.get::<DiscordService>()?
                         .send_notification(message)
