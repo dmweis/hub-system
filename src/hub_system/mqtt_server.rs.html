@@ -228,7 +228,7 @@
             .<span class="ident">add_handler</span>(<span class="string">&quot;zigbee2mqtt/main_door&quot;</span>, <span class="ident">raw_json_handler</span>.<span class="ident">clone</span>())
             .<span class="ident">unwrap</span>();
         <span class="ident">router</span>
-            .<span class="ident">add_handler</span>(<span class="string">&quot;+/blinds/#&quot;</span>, <span class="ident">raw_json_handler</span>.<span class="ident">clone</span>())
+            .<span class="ident">add_handler</span>(<span class="string">&quot;+/blinds/state&quot;</span>, <span class="ident">raw_json_handler</span>.<span class="ident">clone</span>())
             .<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">topics</span> <span class="op">=</span> <span class="ident">router</span>
