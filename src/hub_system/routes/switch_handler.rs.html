@@ -75,8 +75,24 @@
 <span id="70">70</span>
 <span id="71">71</span>
 <span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Injected</span>, <span class="ident">ANNOUNCEMENT</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">blinds_service::BlindsService</span>, <span class="ident">ioc::IocContainer</span>, <span class="ident">speech_service::SpeechService</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">blinds_service::BlindsService</span>, <span class="ident">discord_service::DiscordService</span>, <span class="ident">ioc::IocContainer</span>,
+    <span class="ident">speech_service::SpeechService</span>,
+};
 <span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
 <span class="kw">use</span> <span class="ident">log</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">mqtt_router</span>::{<span class="ident">RouteHandler</span>, <span class="ident">RouterError</span>};
@@ -107,20 +123,30 @@
             <span class="ident">serde_json::from_slice</span>(<span class="ident">content</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">RouterError::HandlerError</span>(<span class="ident">err</span>.<span class="ident">into</span>()))<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">switch_data</span>.<span class="ident">action</span> {
-            <span class="ident">Action::Single</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;{ANNOUNCEMENT} Switch {switch_name} was clicked once&quot;</span>),
-            <span class="ident">Action::Long</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;{ANNOUNCEMENT} Switch {switch_name} was long pressed&quot;</span>),
-            <span class="ident">Action::Double</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;{ANNOUNCEMENT} Switch {switch_name} was double clicked&quot;</span>),
+            <span class="ident">Action::Single</span> =&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(
+                <span class="string">&quot;{ANNOUNCEMENT} Switch {switch_name} was clicked once&quot;</span>
+            )),
+            <span class="ident">Action::Long</span> =&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(
+                <span class="string">&quot;{ANNOUNCEMENT} Switch {switch_name} was long pressed&quot;</span>
+            )),
+            <span class="ident">Action::Double</span> =&gt; <span class="prelude-val">None</span>,
         };
 
-        <span class="self">self</span>.<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">SpeechService</span><span class="op">&gt;</span>()<span class="question-mark">?</span>
-            .<span class="ident">say_cheerful</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>)
-            .<span class="kw">await</span>
-            .<span class="ident">unwrap</span>();
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">message</span>) <span class="op">=</span> <span class="ident">message</span> {
+            <span class="self">self</span>.<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">SpeechService</span><span class="op">&gt;</span>()<span class="question-mark">?</span>
+                .<span class="ident">say_cheerful</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>)
+                .<span class="kw">await</span>
+                .<span class="ident">unwrap</span>();
+        }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Action::Double</span> <span class="op">=</span> <span class="ident">switch_data</span>.<span class="ident">action</span> {
             <span class="self">self</span>.<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">BlindsService</span><span class="op">&gt;</span>()<span class="question-mark">?</span>.<span class="ident">close_both</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
             <span class="self">self</span>.<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">SpeechService</span><span class="op">&gt;</span>()<span class="question-mark">?</span>
                 .<span class="ident">say_cheerful</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{ANNOUNCEMENT} All blinds are closing&quot;</span>))
+                .<span class="kw">await</span>
+                .<span class="ident">unwrap</span>();
+            <span class="self">self</span>.<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">DiscordService</span><span class="op">&gt;</span>()<span class="question-mark">?</span>
+                .<span class="ident">send_notification</span>(<span class="macro">format!</span>(<span class="string">&quot;{ANNOUNCEMENT} All blinds are closing&quot;</span>))
                 .<span class="kw">await</span>
                 .<span class="ident">unwrap</span>();
         }
