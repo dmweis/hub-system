@@ -38,14 +38,18 @@
 <span id="33">33</span>
 <span id="34">34</span>
 <span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">discord_handler</span>;
 <span class="kw">mod</span> <span class="ident">door_sensor</span>;
 <span class="kw">mod</span> <span class="ident">motion_sensor</span>;
+<span class="kw">mod</span> <span class="ident">raw_json_handler</span>;
 <span class="kw">mod</span> <span class="ident">switch_handler</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">discord_handler::DiscordHandler</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">door_sensor</span>::{<span class="ident">DoorSensorData</span>, <span class="ident">DoorSensorHandler</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">motion_sensor</span>::{<span class="ident">MotionSensorData</span>, <span class="ident">MotionSensorHandler</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">raw_json_handler::RawJsonHandler</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">switch_handler::SwitchHandler</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ioc::IocContainer</span>;
