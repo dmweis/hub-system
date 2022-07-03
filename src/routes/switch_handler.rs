@@ -1,5 +1,8 @@
 use super::{Injected, ANNOUNCEMENT};
-use crate::{blinds_service::BlindsService, ioc::IocContainer, speech_service::SpeechService};
+use crate::{
+    blinds_service::BlindsService, discord_service::DiscordService, ioc::IocContainer,
+    speech_service::SpeechService,
+};
 use async_trait::async_trait;
 use log::*;
 use mqtt_router::{RouteHandler, RouterError};
@@ -30,20 +33,30 @@ impl RouteHandler for SwitchHandler {
             serde_json::from_slice(content).map_err(|err| RouterError::HandlerError(err.into()))?;
 
         let message = match switch_data.action {
-            Action::Single => format!("{ANNOUNCEMENT} Switch {switch_name} was clicked once"),
-            Action::Long => format!("{ANNOUNCEMENT} Switch {switch_name} was long pressed"),
-            Action::Double => format!("{ANNOUNCEMENT} Switch {switch_name} was double clicked"),
+            Action::Single => Some(format!(
+                "{ANNOUNCEMENT} Switch {switch_name} was clicked once"
+            )),
+            Action::Long => Some(format!(
+                "{ANNOUNCEMENT} Switch {switch_name} was long pressed"
+            )),
+            Action::Double => None,
         };
 
-        self.get::<SpeechService>()?
-            .say_cheerful(&message)
-            .await
-            .unwrap();
+        if let Some(message) = message {
+            self.get::<SpeechService>()?
+                .say_cheerful(&message)
+                .await
+                .unwrap();
+        }
 
         if let Action::Double = switch_data.action {
             self.get::<BlindsService>()?.close_both().await.unwrap();
             self.get::<SpeechService>()?
                 .say_cheerful(&format!("{ANNOUNCEMENT} All blinds are closing"))
+                .await
+                .unwrap();
+            self.get::<DiscordService>()?
+                .send_notification(format!("{ANNOUNCEMENT} All blinds are closing"))
                 .await
                 .unwrap();
         }
