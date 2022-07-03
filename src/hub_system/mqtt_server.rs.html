@@ -135,8 +135,14 @@
 <span id="130">130</span>
 <span id="131">131</span>
 <span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::routes</span>::{
-    <span class="ident">DiscordHandler</span>, <span class="ident">DoorSensorHandler</span>, <span class="ident">MotionSensorHandler</span>, <span class="ident">RawJsonHandler</span>, <span class="ident">SwitchHandler</span>,
+    <span class="ident">BlindsStateHandler</span>, <span class="ident">DiscordHandler</span>, <span class="ident">DoorSensorHandler</span>, <span class="ident">MotionSensorHandler</span>, <span class="ident">RawJsonHandler</span>,
+    <span class="ident">SwitchHandler</span>,
 };
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">configuration::AppConfig</span>, <span class="ident">ioc::IocContainer</span>};
 <span class="kw">use</span> <span class="ident">log</span>::<span class="kw-2">*</span>;
@@ -213,6 +219,10 @@
                 <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}/new_message/v1&quot;</span>, <span class="ident">whole_sum_boi_base_topic</span>),
                 <span class="ident">DiscordHandler::new</span>(<span class="ident">ioc</span>.<span class="ident">clone</span>()),
             )
+            .<span class="ident">unwrap</span>();
+
+        <span class="ident">router</span>
+            .<span class="ident">add_handler</span>(<span class="string">&quot;+/blinds/state&quot;</span>, <span class="ident">BlindsStateHandler::new</span>(<span class="ident">ioc</span>.<span class="ident">clone</span>()))
             .<span class="ident">unwrap</span>();
 
         <span class="comment">// raw json</span>

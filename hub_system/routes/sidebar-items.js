@@ -1,1 +1,1 @@
-initSidebarItems({"constant":[["ANNOUNCEMENT",""]],"mod":[["discord_handler",""],["door_sensor",""],["motion_sensor",""],["raw_json_handler",""],["switch_handler",""]],"trait":[["Injected",""]]});
+initSidebarItems({"constant":[["ANNOUNCEMENT",""]],"mod":[["blinds_state_handler",""],["discord_handler",""],["door_sensor",""],["motion_sensor",""],["raw_json_handler",""],["switch_handler",""]],"trait":[["Injected",""]]});
