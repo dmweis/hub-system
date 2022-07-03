@@ -11,6 +11,7 @@ pub struct DiscordService {
     whole_sum_boi_base_topic: String,
     notification_channel: u64,
     spam_channel: u64,
+    json_channel: u64,
     channel_name_to_id: HashMap<String, u64>,
     channel_id_to_name: HashMap<u64, String>,
 }
@@ -27,6 +28,7 @@ impl DiscordService {
             whole_sum_boi_base_topic: config.whole_sum_boi_base_topic,
             notification_channel: config.notification_discord_channel,
             spam_channel: config.spam_channel_id,
+            json_channel: config.json_channel_id,
             channel_name_to_id: config.channels,
             channel_id_to_name,
         }
@@ -49,6 +51,20 @@ impl DiscordService {
     pub async fn send_spam(&self, content: String) -> Result<()> {
         let message = DiscordMessageToChannel {
             channel_id: self.spam_channel,
+            content,
+        };
+        let json = serde_json::to_string(&message)?;
+        let topic = format!("{}/say_channel", self.whole_sum_boi_base_topic);
+        self.ioc
+            .service::<AsyncClient>()?
+            .publish(&topic, rumqttc::QoS::AtMostOnce, false, json)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn send_json(&self, content: String) -> Result<()> {
+        let message = DiscordMessageToChannel {
+            channel_id: self.json_channel,
             content,
         };
         let json = serde_json::to_string(&message)?;

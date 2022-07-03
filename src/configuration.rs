@@ -69,5 +69,6 @@ pub struct DiscordBotConfig {
     pub whole_sum_boi_base_topic: String,
     pub notification_discord_channel: u64,
     pub spam_channel_id: u64,
+    pub json_channel_id: u64,
     pub channels: HashMap<String, u64>,
 }

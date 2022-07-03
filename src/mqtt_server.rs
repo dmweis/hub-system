@@ -1,4 +1,6 @@
-use crate::routes::{DiscordHandler, DoorSensorHandler, MotionSensorHandler, SwitchHandler};
+use crate::routes::{
+    DiscordHandler, DoorSensorHandler, MotionSensorHandler, RawJsonHandler, SwitchHandler,
+};
 use crate::{configuration::AppConfig, ioc::IocContainer};
 use log::*;
 use mqtt_router::Router;
@@ -74,6 +76,22 @@ pub fn start_mqtt_service(app_config: AppConfig, ioc: IocContainer) -> anyhow::R
                 &format!("{}/new_message/v1", whole_sum_boi_base_topic),
                 DiscordHandler::new(ioc.clone()),
             )
+            .unwrap();
+
+        // raw json
+
+        let raw_json_handler = RawJsonHandler::new(ioc.clone());
+        router
+            .add_handler("zigbee2mqtt/motion/#", raw_json_handler.clone())
+            .unwrap();
+        router
+            .add_handler("zigbee2mqtt/switch/#", raw_json_handler.clone())
+            .unwrap();
+        router
+            .add_handler("zigbee2mqtt/main_door", raw_json_handler.clone())
+            .unwrap();
+        router
+            .add_handler("+/blinds/#", raw_json_handler.clone())
             .unwrap();
 
         let topics = router

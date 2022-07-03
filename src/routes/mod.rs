@@ -1,11 +1,13 @@
 mod discord_handler;
 mod door_sensor;
 mod motion_sensor;
+mod raw_json_handler;
 mod switch_handler;
 
 pub use discord_handler::DiscordHandler;
 pub use door_sensor::{DoorSensorData, DoorSensorHandler};
 pub use motion_sensor::{MotionSensorData, MotionSensorHandler};
+pub use raw_json_handler::RawJsonHandler;
 pub use switch_handler::SwitchHandler;
 
 use crate::ioc::IocContainer;
