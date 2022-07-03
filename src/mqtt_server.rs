@@ -91,7 +91,7 @@ pub fn start_mqtt_service(app_config: AppConfig, ioc: IocContainer) -> anyhow::R
             .add_handler("zigbee2mqtt/main_door", raw_json_handler.clone())
             .unwrap();
         router
-            .add_handler("+/blinds/#", raw_json_handler.clone())
+            .add_handler("+/blinds/state", raw_json_handler.clone())
             .unwrap();
 
         let topics = router
