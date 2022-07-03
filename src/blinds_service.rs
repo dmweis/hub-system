@@ -76,4 +76,30 @@ impl BlindsService {
             .await?;
         Ok(())
     }
+
+    pub async fn toggle_bedroom(&self) -> Result<()> {
+        self.ioc
+            .service::<AsyncClient>()?
+            .publish(
+                "bedroom/blinds/toggle",
+                rumqttc::QoS::AtMostOnce,
+                false,
+                vec![],
+            )
+            .await?;
+        Ok(())
+    }
+
+    pub async fn toggle_living_room(&self) -> Result<()> {
+        self.ioc
+            .service::<AsyncClient>()?
+            .publish(
+                "living_room/blinds/toggle",
+                rumqttc::QoS::AtMostOnce,
+                false,
+                vec![],
+            )
+            .await?;
+        Ok(())
+    }
 }

@@ -1,5 +1,6 @@
 use crate::routes::{
-    DiscordHandler, DoorSensorHandler, MotionSensorHandler, RawJsonHandler, SwitchHandler,
+    BlindsStateHandler, DiscordHandler, DoorSensorHandler, MotionSensorHandler, RawJsonHandler,
+    SwitchHandler,
 };
 use crate::{configuration::AppConfig, ioc::IocContainer};
 use log::*;
@@ -76,6 +77,10 @@ pub fn start_mqtt_service(app_config: AppConfig, ioc: IocContainer) -> anyhow::R
                 &format!("{}/new_message/v1", whole_sum_boi_base_topic),
                 DiscordHandler::new(ioc.clone()),
             )
+            .unwrap();
+
+        router
+            .add_handler("+/blinds/state", BlindsStateHandler::new(ioc.clone()))
             .unwrap();
 
         // raw json

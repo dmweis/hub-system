@@ -1,9 +1,11 @@
+mod blinds_state_handler;
 mod discord_handler;
 mod door_sensor;
 mod motion_sensor;
 mod raw_json_handler;
 mod switch_handler;
 
+pub use blinds_state_handler::BlindsStateHandler;
 pub use discord_handler::DiscordHandler;
 pub use door_sensor::{DoorSensorData, DoorSensorHandler};
 pub use motion_sensor::{MotionSensorData, MotionSensorHandler};
